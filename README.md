@@ -16,13 +16,7 @@
 ## by conda
 - source activate web3.7
 
-sadas
-
-<<<<<<< HEAD
 - $ jupyter notebook
-=======
--$ jupyter notebook
->>>>>>> e59a14633ef6c469177c5a3b8cf079849410109e
 
 #### …or create a new repository on the command line
 - echo "# python-computer-vision" >> README.md

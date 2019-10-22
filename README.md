@@ -1,5 +1,23 @@
+## by virtual env
 
-$ pip install notebook
+### install virtual env
+python -m pip install --user virtualenv
+### create virtual env
+python -m venv env
+### Activate virtual env
+source env/bin/activate
+.\env\Scripts\activate
+### deactivate virtual env
+.\env\Scripts\deactivate
+
+### instalar dependencias
+pip install -r requeriments.txt
+
+## by conda
+source activate web3.7
+
+sadas
+
 $ jupyter notebook
 
 …or create a new repository on the command line

@@ -1,0 +1,11 @@
+version: '3'
+services:
+  deeplearning:
+    #image: 'gcr.io/tensorflow/tensorflow:latest-gpu'
+    build: .
+    ports:
+      - 8880:8880
+      - 5000:5000
+    volumes:
+      - ./source:/source
+      - ./data:/data

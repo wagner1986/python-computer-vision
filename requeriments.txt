@@ -1,3 +1,6 @@
 notebook
+cmake
+dlib
 face_recognition
 scikit-image
+Pillow

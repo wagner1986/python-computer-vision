@@ -4,3 +4,4 @@ dlib
 face_recognition
 scikit-image
 Pillow
+opencv-python

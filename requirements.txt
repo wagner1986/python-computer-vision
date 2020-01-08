@@ -1,7 +1,7 @@
 notebook
-cmake
-dlib
-face_recognition
+#cmake
+#dlib
+#face_recognition
 scikit-image
 Pillow
 opencv-python==3.4.0.14

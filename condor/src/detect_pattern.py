@@ -113,21 +113,23 @@ class DetectPattern:
 
 
 if __name__ == '__main__':
-    for i in range(1, 18):
-        # path current of projet
-        path_project = dirname(dirname(os.getcwd()))
-        path_project = "{}{}{}{}".format(path_project, os.sep, "data", os.sep)
-        print(path_project)
 
-        detect_image = DetectPattern(can_show=True)
+    # path current of projet
+    path_project = dirname(dirname(os.getcwd()))
+    path_project = "{}{}{}{}".format(path_project, os.sep, "data", os.sep)
+    print(path_project)
+
+    for i in range(1, 18):
+
+
+        detect_image = DetectPattern(can_show=False)
         name_file = "{}seg{}{}.png".format(path_project, os.sep, i)
 
-        print(name_file)
-
         other_image = cv2.imread(name_file)
-        contour_found, tray = detect_image.detect_tray(other_image)
-        output_file_name = "tray_{}.png".format(i)
+
+        contour_found, tray, description = detect_image.detect_tray(other_image)
+        output_file_name = "{}tray{}tray_{}.png".format(path_project, os.sep, i)
         if contour_found is not None:
-            detect_image.plot_image(tray, output_file_name)
+            #detect_image.plot_image(tray, output_file_name)
             cv2.imwrite(output_file_name, tray)
         print('\n')

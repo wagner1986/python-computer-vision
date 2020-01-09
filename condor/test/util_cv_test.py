@@ -2,7 +2,7 @@ import os
 import unittest
 from os.path import dirname
 
-from condor.src.util_cv import UtilCV
+from condor.src.cv_util import UtilCV
 
 
 class UtilCVTestCase(unittest.TestCase):

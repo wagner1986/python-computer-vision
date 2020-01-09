@@ -9,9 +9,11 @@ import numpy as np
 class UtilCV:
     min_frame_std = 0
 
-    def __init__(self, destiny="", percent=50):
+    def __init__(self, destiny="", percent=50, can_show=False, can_write=False):
         self.percent = percent
         self.destiny = destiny
+        self.can_show = can_show
+        self.can_write = can_write
 
     def define_dimension(self, frame):
         height, width, depth = frame.shape
@@ -32,11 +34,12 @@ class UtilCV:
         current_frame = 0
         num_frames_std = 0
         last_status = None
+        frames_stoped = []
         if os.path.isfile(file_name) or file_name == 0:
             cap = cv2.VideoCapture(file_name)
 
             ret, last_frame = cap.read()
-            print('isOpened ', cap.isOpened())
+            #print('isOpened ', cap.isOpened())
             if last_frame is None:
                 print('last_frame ', last_frame)
                 exit()
@@ -45,9 +48,7 @@ class UtilCV:
             last_frame = cv2.resize(last_frame, (int(new_x), int(new_y)))
             last_frame_norm = self.normalize_blur(last_frame)
 
-            frame_parados = 0
             status_motion = "STOP"
-            print('video ', cap.isOpened())
             while cap.isOpened():
                 ret, frame = cap.read()
                 if frame is None:
@@ -66,28 +67,33 @@ class UtilCV:
                     status_motion = "MOTION"
                     if current_frame > self.min_frame_std:
                         num_frames_std = num_frames_std + 1
-                        cv2.imwrite('{}{}seg{}{}{}'.format(self.destiny, os.sep, os.sep, num_frames_std, '.png'),
-                                    last_frame)
-                        print("Grava Frame")
+                        frames_stoped.append(last_frame)
+                        if self.can_write:
+                            cv2.imwrite('{}{}seg{}{}{}'.format(self.destiny, os.sep, os.sep, num_frames_std, '.png'),
+                                        last_frame)
+                            #print("Grava Frame")
+
                     current_frame = 0
 
                 if last_status != status_motion:
                     last_status = status_motion
-                print("current_frame", current_frame, " status_motion ", status_motion)
+
+                #print("current_frame", current_frame, " status_motion ", status_motion)
 
                 # atualiza frame
                 last_frame_norm = newFrame.copy()
                 last_frame = frame.copy()
+                if self.can_show:
+                    # escreve msg na tela
+                    cv2.putText(frame, "Room Status: {}; Number frames stopped: {}".format(status_motion, num_frames_std),
+                                (10, 20), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 2)
+                    cv2.putText(frame, datetime.now().strftime("%A %d %B %Y %I:%M:%S%p"), (10, frame.shape[0] - 10),
+                                cv2.FONT_HERSHEY_SIMPLEX, 0.35, (0, 255, 0), 1)
 
-                # escreve msg na tela
-                cv2.putText(frame, "Room Status: {}; Number frames stopped: {}".format(status_motion, num_frames_std),
-                            (10, 20), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 2)
-                cv2.putText(frame, datetime.now().strftime("%A %d %B %Y %I:%M:%S%p"), (10, frame.shape[0] - 10),
-                            cv2.FONT_HERSHEY_SIMPLEX, 0.35, (0, 255, 0), 1)
+                    motion_detection = self.join_images(newFrame, diff)
 
-                motion_detection = self.join_images(newFrame, diff)
-                cv2.imshow('original', frame)
-                cv2.imshow('motion detection', motion_detection)
+                    cv2.imshow('original', frame)
+                    cv2.imshow('motion detection', motion_detection)
 
                 if cv2.waitKey(33) >= 0:
                     break
@@ -96,6 +102,7 @@ class UtilCV:
             cv2.destroyAllWindows()
         else:
             print("video não existe")
+        return frames_stoped
 
 
 if __name__ == '__main__':
@@ -103,5 +110,6 @@ if __name__ == '__main__':
     path_project = dirname(dirname(os.getcwd()))
     path_project = "{}{}{}{}".format(path_project, os.sep, "data", os.sep)
     print(path_project)
-    util = UtilCV(destiny=path_project)
-    util.segment_movement_video()
+    util = UtilCV(destiny=path_project, can_write=False)
+    list = util.segment_movement_video(file_name = path_project + "kit1.mp4")
+    print(" movimentos detectados "+str(len(list)))

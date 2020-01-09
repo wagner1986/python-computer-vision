@@ -10,8 +10,8 @@ import matplotlib.cm as cm
 
 class DetectPattern:
 
-    def __init__(self):
-        pass
+    def __init__(self, can_show=False):
+        self.can_show = can_show
 
     def get_contour_of_tray(self):
         tray_contour = [[[389, 34]], [[108, 40]],
@@ -67,7 +67,7 @@ class DetectPattern:
         new_image = self.clean_noise(image)
         # Computa contorno apos imagem tratada e realiza calculo de aproximação de poligono
         im2, contours, hierarchy = cv2.findContours(new_image, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_NONE)
-        print('Quantity contours: ', len(contours))
+        #print('Quantity contours: ', len(contours))
         return contours
 
     def crop_min_area_rect(self, img, rect):
@@ -96,29 +96,34 @@ class DetectPattern:
         contours = self.detect_contours(frame)
         contour_found = self.find_more_similar_contour(contours, self.get_contour_of_tray())
         img_crop = None
+        description = {"tray": False}
         if contour_found is not None:
             rect = cv2.minAreaRect(contour_found)
             angle = rect[-1]
-            print(angle)
+            print("angle "+str(angle))
             img_crop = self.crop_min_area_rect(frame, rect)
-            self.plot_image(img_crop, "Img W/ Crop")
+            if self.can_show:
+                self.plot_image(img_crop, "Img W/ Crop")
             cv2.drawContours(frame, contour_found, -3, [0, 255, 0], 3)
+            description["tray"] = True
         else:
             print('Bandeja não encontrada na imagem ')
 
-        return contour_found, img_crop
+        return contour_found, img_crop, description
 
 
 if __name__ == '__main__':
     for i in range(1, 18):
         # path current of projet
         path_project = dirname(dirname(os.getcwd()))
-        path_project = "{}{}{}".format(path_project, os.sep, "data")
+        path_project = "{}{}{}{}".format(path_project, os.sep, "data", os.sep)
         print(path_project)
 
-        detect_image = DetectPattern()
-        name_file = "{}{}kit1{}{}.png".format(path_project, os.sep, os.sep, i)
+        detect_image = DetectPattern(can_show=True)
+        name_file = "{}seg{}{}.png".format(path_project, os.sep, i)
+
         print(name_file)
+
         other_image = cv2.imread(name_file)
         contour_found, tray = detect_image.detect_tray(other_image)
         output_file_name = "tray_{}.png".format(i)

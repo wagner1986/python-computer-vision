@@ -127,3 +127,8 @@ dmypy.json
 # Video e imagens
 *.png
 *.mp4
+
+!data/kit1/*png
+!data/kit2/*
+!data/kit3/*
+!data/tray/*

@@ -14,7 +14,7 @@ class UtilCVTestCase(unittest.TestCase):
         path_project = "{}{}{}{}".format(path_project, os.sep, "data", os.sep)
         util = UtilCV(destiny=path_project)
         frame_list = util.segment_movement_video(file_name=path_project + "kit1.mp4")
-        #print(" movimentos detectados " + str(len(list)))
+        #print(" movimentos detectados " + str(len(frame_list)))
 
         self.assertGreater(len(frame_list), 0, " lista igual a zero")
 

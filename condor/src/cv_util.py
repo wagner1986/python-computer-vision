@@ -107,9 +107,24 @@ class UtilCV:
 
 if __name__ == '__main__':
     # path current of projet
+
     path_project = dirname(dirname(os.getcwd()))
     path_project = "{}{}{}{}".format(path_project, os.sep, "data", os.sep)
     print(path_project)
-    util = UtilCV(destiny=path_project, can_write=False)
-    list = util.segment_movement_video(file_name = path_project + "kit1.mp4")
-    print(" movimentos detectados "+str(len(list)))
+    util = UtilCV(destiny=path_project, can_write=False,can_show=True)
+    list1 = util.segment_movement_video(file_name = path_project + "kit1.mp4")
+    print(" movimentos detectados  1 "+str(len(list1)))
+
+    list2 = util.segment_movement_video(file_name = path_project + "kit2.mp4")
+    print(" movimentos detectados 2 "+str(len(list2)))
+
+    list3 = util.segment_movement_video(file_name = path_project + "kit3.mp4")
+    print(" movimentos detectados 3 "+str(len(list3)))
+
+    #Concatena as 3 listas de imagens
+    list1.extend(list2)
+    list1.extend(list3)
+    print(" movimentos detectados total " + str(len(list1)))
+    for idx,foto in enumerate(list1):
+        cv2.imwrite('{}{}seg{}{:04d}{}'.format(util.destiny, os.sep, os.sep, idx, '.jpg'),foto)
+

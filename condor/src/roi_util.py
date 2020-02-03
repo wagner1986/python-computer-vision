@@ -42,7 +42,7 @@ class RoiUtil:
         gray2 = cv2.cvtColor(duplicate, cv2.COLOR_BGR2GRAY)
         (score, diff) = compare_ssim(gray, gray2, full=True)
         diff = (diff * 255).astype("uint8")
-        print("SSIM: {} Piece found {}".format(score, score < 0.6))
+        #print("SSIM: {} Piece found {}".format(score, score < 0.6))
         return score, diff
 
 
@@ -51,13 +51,13 @@ class RoiUtil:
         gray2 = cv2.cvtColor(duplicate, cv2.COLOR_BGR2GRAY)
         (score, diff) = structural_similarity(gray, gray2, full=True)
         diff = (diff * 255).astype("uint8")
-        print("SSIM: {} Piece found {}".format(score, score < 0.6))
+        #print("SSIM: {} Piece found {}".format(score, score < 0.6))
         return score, diff
 
     def analyse(self, img_original, img_final):
         description = {}
         for key in self.rois:
-            print(key)
+            #print(key)
             if self.rois[key][1] is None:
                 base_img = self.extract_img_roi(img_original, self.rois[key][0])
                 new_img = self.extract_img_roi(img_final, self.rois[key][0])
@@ -76,11 +76,11 @@ class RoiUtil:
                 description[key_int] = False
 
             # Display cropped image
-            cv2.imshow('base_' + key, base_img)
+            #cv2.imshow('base_' + key, base_img)
             # Display cropped image
-            cv2.imshow(key, new_img)
-            cv2.waitKey(0)
-        cv2.destroyAllWindows()
+            #cv2.imshow(key, new_img)
+            #cv2.waitKey(0)
+        #cv2.destroyAllWindows()
 
         return description
 

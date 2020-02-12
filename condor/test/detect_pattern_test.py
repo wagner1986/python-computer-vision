@@ -43,7 +43,7 @@ class DetectPatternTestCase(unittest.TestCase):
         image_base_name = "{}{}{}{}tray{}tray_2.png".format(path_project, os.sep, "data", os.sep, os.sep)
         image_base_test = cv2.imread(image_base_name)
 
-        image_name = "{}{}{}{}seg{}13.png".format(path_project, os.sep, "data", os.sep, os.sep)
+        image_name = "{}{}{}{}seg{}23.png".format(path_project, os.sep, "data", os.sep, os.sep)
         image_test = cv2.imread(image_name)
         self.assertIsNotNone(image_test)
         detect_image = DetectPattern()

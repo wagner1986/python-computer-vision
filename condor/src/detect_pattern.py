@@ -6,12 +6,17 @@ import numpy as np
 # Exibe imagem
 import matplotlib.pyplot as plt
 import matplotlib.cm as cm
-
+from keras.models import load_model
+from keras.models import model_from_json
+import json
 
 class DetectPattern:
 
-    def __init__(self, can_show=True):
+    def __init__(self, model_h5_file= None, model_json_file= None, can_show=False):
+
         self.can_show = can_show
+        self.model_h5_file = model_h5_file
+        self.model_json_file = model_json_file
 
     def get_contour_of_tray(self):
         tray_contour = [[[389, 34]], [[108, 40]],
@@ -67,7 +72,7 @@ class DetectPattern:
         new_image = self.clean_noise(image)
         # Computa contorno apos imagem tratada e realiza calculo de aproximação de poligono
         im2, contours, hierarchy = cv2.findContours(new_image, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_NONE)
-        #print('Quantity contours: ', len(contours))
+        # print('Quantity contours: ', len(contours))
         return contours
 
     def crop_min_area_rect(self, img, rect):
@@ -92,7 +97,6 @@ class DetectPattern:
         # cv2.drawContours(img_rot, [pts], 0, (255,0,255), 2)
         return img_crop
 
-
     def detect_tray(self, frame):
         contours = self.detect_contours(frame)
         contour_found = self.find_more_similar_contour(contours, self.get_contour_of_tray())
@@ -102,14 +106,16 @@ class DetectPattern:
             rect = cv2.minAreaRect(contour_found)
             print(contour_found, rect)
             angle = rect[-1]
-            print("angle "+str(angle))
+            print("angle " + str(angle))
             img_crop = self.crop_min_area_rect(frame, rect)
             if self.can_show:
                 self.plot_image(img_crop, "Img W/ Crop")
             cv2.drawContours(frame, contour_found, -3, [0, 255, 0], 3)
             description["tray"] = True
         else:
-            template = cv2.imread('../../data/bandeja.png')
+            path_project = dirname(dirname(os.getcwd()))
+            print(path_project + '\\data\\bandeja.jpg')
+            template = cv2.imread(path_project + '\\data\\bandeja.jpg')
             res = cv2.matchTemplate(frame, template, cv2.TM_CCORR_NORMED)
 
             min_val, max_val, min_loc, max_loc = cv2.minMaxLoc(res)
@@ -120,12 +126,22 @@ class DetectPattern:
             img_crop = frame[top_left[0]:bottom_right[0],
                        top_left[1]:bottom_right[1]]
             self.plot_image(img_crop, "Img W/ Crop")
-            contour_found=None
+            contour_found = None
             description["tray"] = True
-            print('Bandeja não encontrada na imagem ',max_val)
+            print('Bandeja não encontrada na imagem ', max_val)
 
         return contour_found, img_crop, description
 
+    def detect_deep_learning(self, frame):
+        if os.path.exists(self.model_h5_file) and os.path.exists(self.model_json_file):
+            # load model
+            model = model_from_json(open(self.model_json_file).read())
+            model.load_weights(self.model_h5_file)
+            # summarize model.
+            print(model.summary())
+            return
+        else:
+            return
 
 
 if __name__ == '__main__':
@@ -134,9 +150,14 @@ if __name__ == '__main__':
     path_project = dirname(dirname(os.getcwd()))
     path_project = "{}{}{}{}".format(path_project, os.sep, "data", os.sep)
     print(path_project)
+    model_h5_file= path_project+'model.h5'
+    model_json_file = path_project + 'model.json'
+    print(model_h5_file,model_json_file)
+    detect_image = DetectPattern(model_h5_file=model_h5_file,model_json_file=model_json_file, can_show=True)
+
+    detect_image.detect_deep_learning(None)
 
     for i in range(1, 18):
-
 
         detect_image = DetectPattern(can_show=True)
         name_file = "{}seg{}{}.png".format(path_project, os.sep, i)
@@ -146,6 +167,6 @@ if __name__ == '__main__':
         contour_found, tray, description = detect_image.detect_tray(other_image)
         output_file_name = "{}tray{}tray_{}.png".format(path_project, os.sep, i)
         if tray is not None:
-            #detect_image.plot_image(tray, output_file_name)
+            # detect_image.plot_image(tray, output_file_name)
             cv2.imwrite(output_file_name, tray)
         print('\n')

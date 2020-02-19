@@ -26,6 +26,7 @@ class DetectPatternTestCase(unittest.TestCase):
         self.assertIsNotNone(image_test)
         detect_image = DetectPattern()
         contour_found, tray, description = detect_image.detect_tray(image_test)
+        print(description)
         self.assertTrue(description["tray"])
 
     def test_detecta_bandeja_na_caixa(self):
@@ -54,6 +55,7 @@ class DetectPatternTestCase(unittest.TestCase):
         roi = RoiUtil()
         description = roi.analyse(image_base_test, tray)
         self.assertTrue(description["weapon"])
+        print(description)
 
     def test_detecta_nenhuma_arma(self):
         path_project = dirname(dirname(os.getcwd()))

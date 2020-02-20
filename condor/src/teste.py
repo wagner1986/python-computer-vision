@@ -1,6 +1,11 @@
-from keras.applications.resnet50 import ResNet50
-from keras.preprocessing import image
-from keras.applications.resnet50 import preprocess_input, decode_predictions
 import numpy as np
+def prob_to_binary(predict, labels, threshold):
+    return [labels[id] for id,x in enumerate(predict) if x>=threshold]
 
-model = ResNet50(weights='imagenet')
+pred=np.array([0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00,
+  0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 8.1126725e-1])
+
+labels = ['adptador','bandeja','bateria','cabo','carregador','cartucho','coldre','pendrive','spark']
+
+print(pred.shape)
+print(prob_to_binary(pred,labels,0.3))

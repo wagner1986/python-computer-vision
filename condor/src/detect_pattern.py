@@ -9,14 +9,27 @@ import matplotlib.cm as cm
 from keras.models import load_model
 from keras.models import model_from_json
 import json
+from keras.preprocessing import image
+
+
+def prob_to_binary(predict, labels, threshold):
+    return [labels[id] for id,x in enumerate(predict) if x>=threshold]
+
 
 class DetectPattern:
 
-    def __init__(self, model_h5_file= None, model_json_file= None, can_show=False):
+    def __init__(self, model_h5_file= None, model_json_file= None, can_show=False,labels=[]):
 
         self.can_show = can_show
         self.model_h5_file = model_h5_file
         self.model_json_file = model_json_file
+        self.labels=labels
+        if os.path.exists(self.model_h5_file) and os.path.exists(self.model_json_file):
+            # load model
+            self.model = model_from_json(open(self.model_json_file).read())
+            self.model.load_weights(self.model_h5_file)
+            # summarize model.
+            print(self.model.summary())
 
     def get_contour_of_tray(self):
         tray_contour = [[[389, 34]], [[108, 40]],
@@ -104,7 +117,7 @@ class DetectPattern:
         description = {"tray": False}
         if contour_found is not None:
             rect = cv2.minAreaRect(contour_found)
-            print(contour_found, rect)
+            #print(contour_found, rect)
             angle = rect[-1]
             print("angle " + str(angle))
             img_crop = self.crop_min_area_rect(frame, rect)
@@ -125,7 +138,8 @@ class DetectPattern:
             # crop
             img_crop = frame[top_left[0]:bottom_right[0],
                        top_left[1]:bottom_right[1]]
-            self.plot_image(img_crop, "Img W/ Crop")
+            if self.can_show:
+                self.plot_image(img_crop, "Img W/ Crop")
             contour_found = None
             description["tray"] = True
             print('Bandeja não encontrada na imagem ', max_val)
@@ -133,15 +147,23 @@ class DetectPattern:
         return contour_found, img_crop, description
 
     def detect_deep_learning(self, frame):
-        if os.path.exists(self.model_h5_file) and os.path.exists(self.model_json_file):
-            # load model
-            model = model_from_json(open(self.model_json_file).read())
-            model.load_weights(self.model_h5_file)
-            # summarize model.
-            print(model.summary())
-            return
+        if self.model:
+            width, height = frame.shape[0], frame.shape[1]
+            img = image.array_to_img(frame, scale=False)
+
+            img = img.resize((128, 128))
+
+            img = image.img_to_array(img)
+            img = img / 255.
+            train_x = np.array([img])
+            pred_y=self.model.predict(train_x)[0]
+            print(self.labels)
+            print(pred_y)
+            result = prob_to_binary(pred_y,self.labels,0.08)
+            print(result)
         else:
             return
+
 
 
 if __name__ == '__main__':
@@ -153,17 +175,18 @@ if __name__ == '__main__':
     model_h5_file= path_project+'model.h5'
     model_json_file = path_project + 'model.json'
     print(model_h5_file,model_json_file)
-    detect_image = DetectPattern(model_h5_file=model_h5_file,model_json_file=model_json_file, can_show=True)
+    labels = ['adptador','bandeja','bateria','cabo','carregador','cartucho','coldre','pendrive','spark']
+    detect_image = DetectPattern(model_h5_file=model_h5_file,model_json_file=model_json_file, can_show=False,labels=labels)
 
-    detect_image.detect_deep_learning(None)
 
-    for i in range(1, 18):
 
-        detect_image = DetectPattern(can_show=True)
-        name_file = "{}seg{}{}.png".format(path_project, os.sep, i)
+    for i in range(1, 57):
 
+       # detect_image = DetectPattern(can_show=True)
+        name_file = "{}kit2{}{}.png".format(path_project, os.sep, i)
+        print(name_file)
         other_image = cv2.imread(name_file)
-
+        detect_image.detect_deep_learning(other_image)
         contour_found, tray, description = detect_image.detect_tray(other_image)
         output_file_name = "{}tray{}tray_{}.png".format(path_project, os.sep, i)
         if tray is not None:

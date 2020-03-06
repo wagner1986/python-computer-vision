@@ -160,7 +160,7 @@ class DetectPattern:
             print(self.labels)
             print(pred_y)
             result = prob_to_binary(pred_y,self.labels,0.08)
-            print(result)
+            print('result ',result)
         else:
             return
 
@@ -187,9 +187,12 @@ if __name__ == '__main__':
         print(name_file)
         other_image = cv2.imread(name_file)
         detect_image.detect_deep_learning(other_image)
+        """
         contour_found, tray, description = detect_image.detect_tray(other_image)
         output_file_name = "{}tray{}tray_{}.png".format(path_project, os.sep, i)
         if tray is not None:
             # detect_image.plot_image(tray, output_file_name)
             cv2.imwrite(output_file_name, tray)
         print('\n')
+        """
+

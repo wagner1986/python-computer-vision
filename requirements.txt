@@ -1,3 +1,5 @@
+matplotlib
+keras
 numpy
 notebook
 #cmake

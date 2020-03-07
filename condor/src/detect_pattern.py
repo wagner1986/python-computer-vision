@@ -147,6 +147,7 @@ class DetectPattern:
         return contour_found, img_crop, description
 
     def detect_deep_learning(self, frame):
+        print(frame.shape)
         if self.model:
             width, height = frame.shape[0], frame.shape[1]
             img = image.array_to_img(frame, scale=False)
@@ -163,6 +164,7 @@ class DetectPattern:
             print('result ',result)
         else:
             return
+        return result
 
 
 
@@ -180,7 +182,7 @@ if __name__ == '__main__':
 
 
 
-    for i in range(1, 57):
+    for i in range(1, 30):
 
        # detect_image = DetectPattern(can_show=True)
         name_file = "{}kit2{}{}.png".format(path_project, os.sep, i)

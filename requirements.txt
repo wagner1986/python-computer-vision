@@ -5,4 +5,4 @@ face_recognition
 scikit-image
 Pillow
 opencv-python==3.4.0.14
-opencv-contrib-python==3.4.0.14
+opencv-contrib-python==3.4.7.28
